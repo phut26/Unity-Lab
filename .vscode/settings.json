@@ -67,5 +67,8 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "Unity-Lab.slnx"
+    "dotnet.defaultSolution": "Unity-Lab.slnx",
+    "cSpell.words": [
+        "Unlockable"
+    ]
 }
