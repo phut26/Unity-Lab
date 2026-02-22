@@ -16,7 +16,8 @@ namespace SkillTree.Tests.EditMode
         {
             SkillSO skill = CreateSkill(skillId);
             FakeStore store = new();
-            SkillTreeService sut = new(new[] { skill }, store);
+            FakeResourceCatalog fakeResourceCatalog = new(isSupported: true);
+            SkillTreeService sut = new(new[] { skill }, store, fakeResourceCatalog);
             FakeContext context = new(canPay: true, tryPay: true);
 
             var result = sut.TryUpgrade(skillId, context);
@@ -32,7 +33,8 @@ namespace SkillTree.Tests.EditMode
         {
             SkillSO skill = CreateSkill(skillId);
             FakeStore store = new();
-            SkillTreeService sut = new(new[] { skill }, store);
+            FakeResourceCatalog fakeResourceCatalog = new(isSupported: true);
+            SkillTreeService sut = new(new[] { skill }, store, fakeResourceCatalog);
             FakeContext context = new(canPay: false, tryPay: true);
 
             var result = sut.TryUpgrade(skillId, context);
@@ -48,7 +50,8 @@ namespace SkillTree.Tests.EditMode
             SkillSO root = CreateSkill("root");
             SkillSO child = CreateSkill("child", prerequisites: new[] { "root" });
             FakeStore store = new();
-            SkillTreeService sut = new(new[] { root, child }, store);
+            FakeResourceCatalog fakeResourceCatalog = new(isSupported: true);
+            SkillTreeService sut = new(new[] { root, child }, store, fakeResourceCatalog);
             FakeContext context = new(canPay: true, tryPay: true);
 
             var result = sut.TryUpgrade("child", context);
@@ -64,8 +67,11 @@ namespace SkillTree.Tests.EditMode
             SkillSO skillA = CreateSkill("A", prerequisites: new[] { "B" });
             SkillSO skillB = CreateSkill("B", prerequisites: new[] { "A" });
             FakeStore store = new();
+            FakeResourceCatalog fakeResourceCatalog = new(isSupported: true);
 
-            Assert.Throws<InvalidOperationException>(() => new SkillTreeService(new[] { skillA, skillB }, store));
+            Assert.Throws<InvalidOperationException>(
+                () => new SkillTreeService(
+                    new[] { skillA, skillB }, store, fakeResourceCatalog));
         }
 
         [Test]
@@ -73,7 +79,8 @@ namespace SkillTree.Tests.EditMode
         {
             SkillSO skill = CreateSkill(skillId);
             FakeStore store = new(new Dictionary<string, int> { [skillId] = 1 });
-            SkillTreeService sut = new(new[] { skill }, store);
+            FakeResourceCatalog fakeResourceCatalog = new(isSupported: true);
+            SkillTreeService sut = new(new[] { skill }, store, fakeResourceCatalog);
 
             sut.ResetProgression();
 
@@ -87,7 +94,8 @@ namespace SkillTree.Tests.EditMode
         {
             SkillSO skill = CreateSkill(skillId);
             FakeStore store = new();
-            SkillTreeService sut = new(new[] { skill }, store);
+            FakeResourceCatalog fakeResourceCatalog = new(isSupported: true);
+            SkillTreeService sut = new(new[] { skill }, store, fakeResourceCatalog);
             FakeContext context = new(canPay: true, tryPay: false);
 
             var result = sut.TryUpgrade(skillId, context);
@@ -103,8 +111,9 @@ namespace SkillTree.Tests.EditMode
         {
             int maxLevel = 5;
             SkillSO skill = CreateSkill(skillId, maxLevel);
+            FakeResourceCatalog fakeResourceCatalog = new(isSupported: true);
             FakeStore store = new(new Dictionary<string, int> { [skillId] = maxLevel });
-            SkillTreeService sut = new(new[] { skill }, store);
+            SkillTreeService sut = new(new[] { skill }, store, fakeResourceCatalog);
             FakeContext context = new(canPay: true, tryPay: true);
 
             var result = sut.TryUpgrade(skill.SkillId, context);
@@ -119,7 +128,8 @@ namespace SkillTree.Tests.EditMode
         {
             SkillSO skill = CreateSkill(skillId);
             FakeStore store = new();
-            SkillTreeService sut = new(new[] { skill }, store);
+            FakeResourceCatalog fakeResourceCatalog = new(isSupported: true);
+            SkillTreeService sut = new(new[] { skill }, store, fakeResourceCatalog);
             FakeContext context = new(canPay: true, tryPay: true);
 
             int callCount = 0;
@@ -144,7 +154,8 @@ namespace SkillTree.Tests.EditMode
         {
             SkillSO skill = CreateSkill(skillId);
             FakeStore store = new();
-            SkillTreeService sut = new(new[] { skill }, store);
+            FakeResourceCatalog fakeResourceCatalog = new(isSupported: true);
+            SkillTreeService sut = new(new[] { skill }, store, fakeResourceCatalog);
             FakeContext context = new(canPay: false, tryPay: true);
 
             int callCount = 0;
@@ -161,7 +172,8 @@ namespace SkillTree.Tests.EditMode
         {
             SkillSO skill = CreateSkill(skillId);
             FakeStore store = new(new Dictionary<string, int> { [skillId] = 1 });
-            SkillTreeService sut = new(new[] { skill }, store);
+            FakeResourceCatalog fakeResourceCatalog = new(isSupported: true);
+            SkillTreeService sut = new(new[] { skill }, store, fakeResourceCatalog);
 
             int callCount = 0;
             sut.OnLevelsReset += () => callCount++;
@@ -179,10 +191,10 @@ namespace SkillTree.Tests.EditMode
             var so = ScriptableObject.CreateInstance<SkillSO>();
             so.SkillId = id;
             so.MaxLevel = maxLevel;
-            so.prerequisiteIds = prerequisites != null ? new List<string>(prerequisites) : new List<string>();
-            so.upgradeCosts = new List<CostDefinition>
+            so.PrerequisiteIds = prerequisites != null ? new List<string>(prerequisites) : new List<string>();
+            so.UpgradeCosts = new List<CostDefinition>
         {
-            new() { Key = "gold", CosType = "currency", Amount = 10 }
+            new() { Key = "gold", CostType = CostType.Currency, Amount = 10 }
         };
 
             return so;
@@ -245,6 +257,31 @@ namespace SkillTree.Tests.EditMode
                 foreach (var id in skillIds)
                     _levels.Remove(id);
             }
+        }
+
+
+        private sealed class FakeResourceCatalog : ICostCatalog
+        {
+            private readonly bool _isSupported;
+
+            public FakeResourceCatalog(bool isSupported)
+            {
+                _isSupported = isSupported;
+            }
+
+            public IReadOnlyCollection<string> GetKeys(CostType type)
+            {
+                throw new NotImplementedException();
+            }
+
+
+            public bool IsDefined(CostDefinition cost) => _isSupported;
+
+            public bool IsDefined(CostType type, string key)
+            {
+                throw new NotImplementedException();
+            }
+
         }
     }
 }

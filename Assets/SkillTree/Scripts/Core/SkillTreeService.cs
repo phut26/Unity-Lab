@@ -21,21 +21,24 @@ namespace SkillTree.Core
         public event Action<Skill> OnLevelChanged;
         public event Action OnLevelsReset;
 
-        public SkillTreeService(IEnumerable<SkillSO> skillData, ISkillProgressStore store)
+        public SkillTreeService(
+            IEnumerable<SkillSO> skillData,
+            ISkillProgressStore store,
+            ICostCatalog costCatalog)
         {
             if (skillData == null) throw new ArgumentNullException(nameof(skillData));
             _store = store ?? throw new ArgumentNullException(nameof(store));
 
-            var skills = ValidateSkillData(skillData);
-
+            List<SkillSO> skills = ValidateSkillData(skillData);
+            ValidateUpgradeCosts(skills, costCatalog);
             InitSkills(skills);
         }
 
         private static List<SkillSO> ValidateSkillData(IEnumerable<SkillSO> skillData)
         {
             List<SkillSO> skills = skillData is ICollection<SkillSO> skillCollection
-                ? new List<SkillSO>(skillCollection.Count)
-                : new List<SkillSO>();
+                ? new (skillCollection.Count)
+                : new ();
 
             foreach (SkillSO skill in skillData)
             {
@@ -70,19 +73,24 @@ namespace SkillTree.Core
             ValidatePrerequisites();
         }
 
+        private void ValidateUpgradeCosts(IEnumerable<SkillSO> skills, ICostCatalog costCatalog)
+        {
+            if (skills == null) throw new ArgumentNullException();
+            if (costCatalog == null) throw new ArgumentException();
+            foreach (SkillSO skill in skills)
+                foreach (CostDefinition cost in skill.UpgradeCosts)
+                    if (!costCatalog.IsDefined(cost))
+                        throw new InvalidOperationException($"Invalid Cost Definition: {skill.SkillId}-{cost.Key}-{cost.CostType}-{cost.Amount}");
+        }
+
+
         private void ValidatePrerequisites()
         {
             foreach (Skill skill in _skillCache.Values)
-            {
                 foreach (string prerequisiteId in skill.PrerequisiteIds)
-                {
                     if (!_skillCache.ContainsKey(prerequisiteId))
-                    {
                         throw new InvalidOperationException(
                             $"Skill '{skill.SkillId}' has unknown prerequisite id '{prerequisiteId}'.");
-                    }
-                }
-            }
 
             ValidateNoPrerequisiteCycle();
         }
@@ -93,10 +101,8 @@ namespace SkillTree.Core
             var currentPath = new Stack<string>();
 
             foreach (var skillId in _skillCache.Keys)
-            {
                 if (visitState.GetValueOrDefault(skillId) == 0)
                     DetectPrerequisiteCycle(skillId, visitState, currentPath);
-            }
         }
 
         private void DetectPrerequisiteCycle(

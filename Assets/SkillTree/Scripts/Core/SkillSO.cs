@@ -5,11 +5,18 @@ using UnityEngine;
 
 namespace SkillTree.Core
 {
+    public enum CostType
+    {
+        Currency,
+        Item,
+        Energy,
+    }
+
     [Serializable]
     public struct CostDefinition
     {
         public string Key;
-        public string CosType;
+        public CostType CostType;
         public int Amount;
     }
 
@@ -52,9 +59,9 @@ namespace SkillTree.Core
         [Min(1)]
         public int MaxLevel;
 
-        public List<string> prerequisiteIds = new();
-        public List<EffectDefinition> effects = new();
-        public List<CostDefinition> upgradeCosts = new();
+        public List<string> PrerequisiteIds = new();
+        public List<EffectDefinition> Effects = new();
+        public List<CostDefinition> UpgradeCosts = new();
         
         public Vector2 NodePosition;
     }

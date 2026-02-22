@@ -24,9 +24,9 @@ namespace SkillTree.Core
             _maxLevel = skillData.MaxLevel;
             _currentLevel = Math.Clamp(level, 0, _maxLevel);
 
-            UpgradeCosts = SnapshotList(skillData.upgradeCosts);
-            PrerequisiteIds = SnapshotList(skillData.prerequisiteIds);
-            EffectDefinitions = SnapshotList(skillData.effects);
+            UpgradeCosts = SnapshotList(skillData.UpgradeCosts);
+            PrerequisiteIds = SnapshotList(skillData.PrerequisiteIds);
+            EffectDefinitions = SnapshotList(skillData.Effects);
         }
 
 

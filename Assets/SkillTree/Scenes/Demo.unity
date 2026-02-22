@@ -461,7 +461,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3776127abfa4bd4d90812676a9165f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkillTreeBehaviour
-  skillData: []
+  _skillData:
+  - {fileID: 11400000, guid: c2632bc35c1f77b489d55f753399b03f, type: 2}
+  _resourceCatalog:
+  - {fileID: 11400000, guid: a9f112066ccf9bd4da93e924ef1f07d3, type: 2}
 --- !u!4 &1254251141
 Transform:
   m_ObjectHideFlags: 0
