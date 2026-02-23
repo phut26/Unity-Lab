@@ -12,4 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8da9cae22d505734ba6841ac5ff384b3, type: 3}
   m_Name: ResourceCatalog
   m_EditorClassIdentifier: SkillTree.Runtime::SkillTree.Core.ResourceCatalogSO
-  _entries: []
+  _entries:
+  - Key: gold
+    CostType: 0
+    DisplayName: Gold
+    Icon: {fileID: 0}
+  - Key: essence
+    CostType: 0
+    DisplayName: Essence
+    Icon: {fileID: 0}

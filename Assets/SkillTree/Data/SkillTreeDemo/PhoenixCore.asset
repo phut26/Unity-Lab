@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 193d88c167a7edc4990b47af0afa245e, type: 3}
+  m_Name: PhoenixCore
+  m_EditorClassIdentifier: SkillTree.Runtime::SkillTree.Core.SkillSO
+  SkillId: phoenix_core
+  DisplayName: Phoenix Core
+  Description: Merges both branches into a decisive critical spell boost.
+  Icon: {fileID: 0}
+  MaxLevel: 1
+  PrerequisiteIds:
+  - flame_wave
+  - mana_barrier
+  Effects:
+  - TargetType: Stat
+    StatId: spell_crit
+    Operation: 0
+    Value: 0.1
+  UpgradeCosts:
+  - Key: gold
+    CostType: 0
+    Amount: 220
+  - Key: essence
+    CostType: 0
+    Amount: 4
+  NodePosition: {x: 0, y: -530}

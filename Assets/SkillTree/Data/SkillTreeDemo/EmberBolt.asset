@@ -10,17 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 193d88c167a7edc4990b47af0afa245e, type: 3}
-  m_Name: NewSkillSO
+  m_Name: EmberBolt
   m_EditorClassIdentifier: SkillTree.Runtime::SkillTree.Core.SkillSO
-  SkillId: fireball
-  DisplayName: Fire Ball
-  Description: Fire ball
+  SkillId: ember_bolt
+  DisplayName: Ember Bolt
+  Description: Launches condensed embers that improve spell power.
   Icon: {fileID: 0}
-  MaxLevel: 1
-  PrerequisiteIds: []
-  Effects: []
+  MaxLevel: 4
+  PrerequisiteIds:
+  - core_attunement
+  Effects:
+  - TargetType: Stat
+    StatId: spell_power
+    Operation: 0
+    Value: 3
   UpgradeCosts:
-  - Key: a
+  - Key: gold
     CostType: 0
-    Amount: 3
-  NodePosition: {x: 0, y: 0}
+    Amount: 45
+  - Key: essence
+    CostType: 0
+    Amount: 1
+  NodePosition: {x: -260, y: -160}

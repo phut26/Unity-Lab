@@ -1,7 +1,9 @@
 {
   "name": "SkillTree.Runtime",
   "rootNamespace": "SkillTree",
-  "references": [],
+  "references": [
+    "Unity.InputSystem"
+  ],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

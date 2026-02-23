@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 193d88c167a7edc4990b47af0afa245e, type: 3}
+  m_Name: CoreAttunement
+  m_EditorClassIdentifier: SkillTree.Runtime::SkillTree.Core.SkillSO
+  SkillId: core_attunement
+  DisplayName: Core Attunement
+  Description: Strengthens arcane attunement to improve mana regeneration.
+  Icon: {fileID: 0}
+  MaxLevel: 3
+  PrerequisiteIds: []
+  Effects:
+  - TargetType: Stat
+    StatId: mana_regen
+    Operation: 0
+    Value: 0.5
+  UpgradeCosts:
+  - Key: gold
+    CostType: 0
+    Amount: 40
+  NodePosition: {x: 0, y: 20}

@@ -442,6 +442,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1254251141}
   - component: {fileID: 1254251140}
+  - component: {fileID: 1254251142}
+  - component: {fileID: 1254251143}
+  - component: {fileID: 1254251144}
   m_Layer: 0
   m_Name: SkillTreeBehaviour
   m_TagString: Untagged
@@ -460,11 +463,71 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c3776127abfa4bd4d90812676a9165f8, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SkillTreeBehaviour
+  m_EditorClassIdentifier: SkillTree.Runtime::SkillTree.Demo.SkillTreeBehaviour
   _skillData:
-  - {fileID: 11400000, guid: c2632bc35c1f77b489d55f753399b03f, type: 2}
-  _resourceCatalog:
-  - {fileID: 11400000, guid: a9f112066ccf9bd4da93e924ef1f07d3, type: 2}
+  - {fileID: 11400000, guid: b6740d19d05e40d59dffa3a261bdae11, type: 2}
+  - {fileID: 11400000, guid: 977086bfbd714907ad84a7b13f7fb515, type: 2}
+  - {fileID: 11400000, guid: f4227456c16e4ff9931a08c6668d65fd, type: 2}
+  - {fileID: 11400000, guid: 997d500bba914efe8f0e6a4ec98fa028, type: 2}
+  - {fileID: 11400000, guid: 747e912b3038483c9b9cac0feaa37347, type: 2}
+  - {fileID: 11400000, guid: 8bed69a00110404db8fad6b23ee7d924, type: 2}
+  _resourceCatalog: {fileID: 11400000, guid: a04b0c376613d8042a05e2aba01f8db5, type: 2}
+--- !u!114 &1254251142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1254251139}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef2e226596c943879af3be54c60084b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SkillTree.Runtime::SkillTree.Demo.StatSystem
+  _baseStats:
+  - StatId: mana_regen
+    BaseValue: 1
+  - StatId: spell_power
+    BaseValue: 10
+  - StatId: mana_cost_ratio
+    BaseValue: 1
+  - StatId: aoe_damage
+    BaseValue: 0
+  - StatId: shield_value
+    BaseValue: 0
+  - StatId: spell_crit
+    BaseValue: 0.05
+--- !u!114 &1254251143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1254251139}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b4dc1dbaa8343b69820ba7f33a640fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SkillTree.Runtime::SkillTree.Demo.SkillEffectAdapter
+  _skillTreeBehaviour: {fileID: 1254251140}
+  _statSystem: {fileID: 1254251142}
+--- !u!114 &1254251144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1254251139}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97cfa85c4d994eb0abd619d5ead1778f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SkillTree.Runtime::SkillTree.Demo.SkillTreeDebugController
+  _skillTreeBehaviour: {fileID: 1254251140}
+  _statSystem: {fileID: 1254251142}
+  _resourceCatalog: {fileID: 11400000, guid: a04b0c376613d8042a05e2aba01f8db5, type: 2}
+  _startingGold: 1200
+  _startingEssence: 30
 --- !u!4 &1254251141
 Transform:
   m_ObjectHideFlags: 0
