@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using SkillTree.Core;
+using SkillTree.Demo;
 using UnityEngine;
 
 
@@ -282,6 +283,270 @@ namespace SkillTree.Tests.EditMode
                 throw new NotImplementedException();
             }
 
+        }
+    }
+
+    public class SkillTreePresenterTests
+    {
+        [Test]
+        public void Refresh_TracksLockedAndUnlockedStates()
+        {
+            SkillSO root = CreateSkill("root", costs: new[] { new CostDefinition { Key = "gold", CostType = CostType.Currency, Amount = 10 } });
+            SkillSO child = CreateSkill(
+                "child",
+                prerequisites: new[] { "root" },
+                costs: new[] { new CostDefinition { Key = "gold", CostType = CostType.Currency, Amount = 10 } });
+
+            FakeStore store = new();
+            FakeCostCatalog catalog = new(new[] { "gold" });
+            FakeWalletContext wallet = new(new Dictionary<string, int> { ["gold"] = 20 });
+            SkillTreeService service = new(new[] { root, child }, store, catalog);
+
+            using SkillTreePresenter presenter = new(new[] { root, child }, service, wallet);
+
+            SkillNodeViewModel rootNode = presenter.GetNodeById("root");
+            SkillNodeViewModel childNode = presenter.GetNodeById("child");
+
+            Assert.That(rootNode.IsLocked, Is.False);
+            Assert.That(rootNode.IsUnlocked, Is.True);
+            Assert.That(rootNode.IsMaxed, Is.False);
+            Assert.That(rootNode.CanAfford, Is.True);
+            Assert.That(rootNode.CanUpgrade, Is.True);
+
+            Assert.That(childNode.IsLocked, Is.True);
+            Assert.That(childNode.IsUnlocked, Is.False);
+            Assert.That(childNode.CanAfford, Is.False);
+            Assert.That(childNode.CanUpgrade, Is.False);
+
+            Assert.That(presenter.TryUpgrade("root"), Is.EqualTo(SkillUpgradeResult.Success));
+
+            childNode = presenter.GetNodeById("child");
+            Assert.That(childNode.IsLocked, Is.False);
+            Assert.That(childNode.IsUnlocked, Is.True);
+            Assert.That(childNode.CanAfford, Is.True);
+            Assert.That(childNode.CanUpgrade, Is.True);
+        }
+
+        [Test]
+        public void Refresh_MaxedSkill_DisablesUpgrade()
+        {
+            SkillSO skill = CreateSkill(
+                "maxed",
+                maxLevel: 1,
+                costs: new[] { new CostDefinition { Key = "gold", CostType = CostType.Currency, Amount = 10 } });
+
+            FakeStore store = new(new Dictionary<string, int> { ["maxed"] = 1 });
+            FakeCostCatalog catalog = new(new[] { "gold" });
+            FakeWalletContext wallet = new(new Dictionary<string, int> { ["gold"] = 100 });
+            SkillTreeService service = new(new[] { skill }, store, catalog);
+
+            using SkillTreePresenter presenter = new(new[] { skill }, service, wallet);
+            SkillNodeViewModel node = presenter.GetNodeById("maxed");
+
+            Assert.That(node.IsUnlocked, Is.True);
+            Assert.That(node.IsMaxed, Is.True);
+            Assert.That(node.CanAfford, Is.False);
+            Assert.That(node.CanUpgrade, Is.False);
+        }
+
+        [Test]
+        public void Refresh_AffordabilityChangesAfterWalletUpdate()
+        {
+            SkillSO skill = CreateSkill(
+                "costly",
+                costs: new[] { new CostDefinition { Key = "gold", CostType = CostType.Currency, Amount = 50 } });
+
+            FakeStore store = new();
+            FakeCostCatalog catalog = new(new[] { "gold" });
+            FakeWalletContext wallet = new(new Dictionary<string, int> { ["gold"] = 10 });
+            SkillTreeService service = new(new[] { skill }, store, catalog);
+
+            using SkillTreePresenter presenter = new(new[] { skill }, service, wallet);
+            SkillNodeViewModel node = presenter.GetNodeById("costly");
+            Assert.That(node.CanAfford, Is.False);
+            Assert.That(node.CanUpgrade, Is.False);
+
+            wallet.Add("gold", 40);
+            presenter.Refresh();
+
+            node = presenter.GetNodeById("costly");
+            Assert.That(node.CanAfford, Is.True);
+            Assert.That(node.CanUpgrade, Is.True);
+        }
+
+        [Test]
+        public void ServiceReset_RefreshesNodeLevel()
+        {
+            SkillSO skill = CreateSkill(
+                "resettable",
+                maxLevel: 2,
+                costs: new[] { new CostDefinition { Key = "gold", CostType = CostType.Currency, Amount = 10 } });
+
+            FakeStore store = new();
+            FakeCostCatalog catalog = new(new[] { "gold" });
+            FakeWalletContext wallet = new(new Dictionary<string, int> { ["gold"] = 100 });
+            SkillTreeService service = new(new[] { skill }, store, catalog);
+
+            using SkillTreePresenter presenter = new(new[] { skill }, service, wallet);
+            Assert.That(presenter.TryUpgrade("resettable"), Is.EqualTo(SkillUpgradeResult.Success));
+            Assert.That(presenter.GetNodeById("resettable").Level, Is.EqualTo(1));
+
+            service.ResetProgression();
+
+            Assert.That(presenter.GetNodeById("resettable").Level, Is.EqualTo(0));
+        }
+
+        private static SkillSO CreateSkill(
+            string id,
+            int maxLevel = 1,
+            IEnumerable<string> prerequisites = null,
+            IEnumerable<CostDefinition> costs = null)
+        {
+            SkillSO skill = ScriptableObject.CreateInstance<SkillSO>();
+            skill.SkillId = id;
+            skill.DisplayName = id;
+            skill.MaxLevel = maxLevel;
+            skill.PrerequisiteIds = prerequisites != null
+                ? new List<string>(prerequisites)
+                : new List<string>();
+            skill.UpgradeCosts = costs != null
+                ? new List<CostDefinition>(costs)
+                : new List<CostDefinition>();
+            return skill;
+        }
+
+        private sealed class FakeWalletContext : ISkillContext
+        {
+            private readonly Dictionary<string, int> _balances;
+
+            public FakeWalletContext(IReadOnlyDictionary<string, int> balances)
+            {
+                _balances = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                foreach (KeyValuePair<string, int> pair in balances)
+                    _balances[pair.Key] = Math.Max(0, pair.Value);
+            }
+
+            public void Add(string key, int amount)
+            {
+                if (string.IsNullOrWhiteSpace(key) || amount <= 0)
+                    return;
+
+                key = key.Trim();
+                _balances[key] = _balances.GetValueOrDefault(key, 0) + amount;
+            }
+
+            public bool CanPay(IEnumerable<CostDefinition> costs) =>
+                TryBuildRequirements(costs, out Dictionary<string, int> required) && HasEnough(required);
+
+            public bool TryPay(IEnumerable<CostDefinition> costs)
+            {
+                if (!TryBuildRequirements(costs, out Dictionary<string, int> required))
+                    return false;
+
+                if (!HasEnough(required))
+                    return false;
+
+                foreach (KeyValuePair<string, int> pair in required)
+                    _balances[pair.Key] -= pair.Value;
+
+                return true;
+            }
+
+            private bool TryBuildRequirements(
+                IEnumerable<CostDefinition> costs,
+                out Dictionary<string, int> required)
+            {
+                required = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                if (costs == null)
+                    return true;
+
+                foreach (CostDefinition cost in costs)
+                {
+                    if (cost.CostType != CostType.Currency)
+                        return false;
+
+                    if (string.IsNullOrWhiteSpace(cost.Key) || cost.Amount <= 0)
+                        return false;
+
+                    string key = cost.Key.Trim();
+                    if (!_balances.ContainsKey(key))
+                        return false;
+
+                    required[key] = required.GetValueOrDefault(key, 0) + cost.Amount;
+                }
+
+                return true;
+            }
+
+            private bool HasEnough(IReadOnlyDictionary<string, int> required)
+            {
+                foreach (KeyValuePair<string, int> pair in required)
+                    if (_balances.GetValueOrDefault(pair.Key, 0) < pair.Value)
+                        return false;
+
+                return true;
+            }
+        }
+
+        private sealed class FakeStore : ISkillProgressStore
+        {
+            private readonly Dictionary<string, int> _levels;
+
+            public FakeStore(Dictionary<string, int> levels = null)
+            {
+                _levels = levels != null
+                    ? new Dictionary<string, int>(levels)
+                    : new Dictionary<string, int>();
+            }
+
+            public int GetLevel(string skillId) => _levels.GetValueOrDefault(skillId, 0);
+
+            public IReadOnlyDictionary<string, int> LoadAll(IEnumerable<string> skillIds)
+            {
+                Dictionary<string, int> result = new();
+                foreach (string skillId in skillIds)
+                    result[skillId] = _levels.GetValueOrDefault(skillId, 0);
+
+                return result;
+            }
+
+            public void SaveAll(IReadOnlyDictionary<string, int> levels)
+            {
+                foreach (KeyValuePair<string, int> pair in levels)
+                    _levels[pair.Key] = pair.Value;
+            }
+
+            public void Clear(IEnumerable<string> skillIds)
+            {
+                foreach (string skillId in skillIds)
+                    _levels.Remove(skillId);
+            }
+        }
+
+        private sealed class FakeCostCatalog : ICostCatalog
+        {
+            private readonly HashSet<(CostType Type, string Key)> _definedCosts = new();
+            private readonly HashSet<string> _currencyKeys = new(StringComparer.OrdinalIgnoreCase);
+
+            public FakeCostCatalog(IEnumerable<string> currencyKeys)
+            {
+                foreach (string key in currencyKeys)
+                {
+                    _definedCosts.Add((CostType.Currency, key));
+                    _currencyKeys.Add(key);
+                }
+            }
+
+            public bool IsDefined(CostDefinition cost)
+            {
+                if (string.IsNullOrWhiteSpace(cost.Key))
+                    return false;
+
+                return _definedCosts.Contains((cost.CostType, cost.Key.Trim()));
+            }
+
+            public IReadOnlyCollection<string> GetKeys(CostType type) =>
+                type == CostType.Currency ? _currencyKeys : Array.Empty<string>();
         }
     }
 }

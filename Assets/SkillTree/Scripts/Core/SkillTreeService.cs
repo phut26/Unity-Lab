@@ -75,8 +75,8 @@ namespace SkillTree.Core
 
         private void ValidateUpgradeCosts(IEnumerable<SkillSO> skills, ICostCatalog costCatalog)
         {
-            if (skills == null) throw new ArgumentNullException();
-            if (costCatalog == null) throw new ArgumentException();
+            if (skills == null) throw new ArgumentNullException(nameof(skills));
+            if (costCatalog == null) throw new ArgumentException(nameof(costCatalog));
             foreach (SkillSO skill in skills)
                 foreach (CostDefinition cost in skill.UpgradeCosts)
                     if (!costCatalog.IsDefined(cost))

@@ -15,7 +15,7 @@ MonoBehaviour:
   SkillId: phoenix_core
   DisplayName: Phoenix Core
   Description: Merges both branches into a decisive critical spell boost.
-  Icon: {fileID: 0}
+  Icon: {fileID: 21300000, guid: d04f95edd5ef0814b83dba4395cd6018, type: 3}
   MaxLevel: 1
   PrerequisiteIds:
   - flame_wave
@@ -32,4 +32,4 @@ MonoBehaviour:
   - Key: essence
     CostType: 0
     Amount: 4
-  NodePosition: {x: 0, y: -530}
+  NodePosition: {x: -600, y: 600}

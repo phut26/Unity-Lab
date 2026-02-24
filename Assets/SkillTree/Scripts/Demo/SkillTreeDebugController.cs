@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using SkillTree.Core;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
@@ -13,9 +11,6 @@ namespace SkillTree.Demo
     {
         [SerializeField] private SkillTreeBehaviour _skillTreeBehaviour;
         [SerializeField] private StatSystem _statSystem;
-        [SerializeField] private ResourceCatalogSO _resourceCatalog;
-        [SerializeField] private int _startingGold = 1200;
-        [SerializeField] private int _startingEssence = 30;
 
         private SkillTreeService _service;
         private WalletContext _wallet;
@@ -136,26 +131,19 @@ namespace SkillTree.Demo
                 return;
 
             AutoResolveReferences();
-            if (_skillTreeBehaviour == null || _statSystem == null || _resourceCatalog == null)
+            if (_skillTreeBehaviour == null || _statSystem == null)
             {
                 Debug.LogWarning("[SkillTreeDemo] Missing references. Cannot initialize debug controller.");
                 return;
             }
 
             _service = _skillTreeBehaviour.Service;
-            if (_service == null)
+            _wallet = _skillTreeBehaviour.Wallet;
+            if (_service == null || _wallet == null)
             {
-                Debug.LogWarning("[SkillTreeDemo] SkillTreeService not ready.");
+                Debug.LogWarning("[SkillTreeDemo] SkillTreeSession not ready.");
                 return;
             }
-
-            ICostCatalog catalog = new ResourceCatalogAdapter(_resourceCatalog);
-            Dictionary<string, int> initialBalances = new(StringComparer.OrdinalIgnoreCase)
-            {
-                ["gold"] = Math.Max(0, _startingGold),
-                ["essence"] = Math.Max(0, _startingEssence)
-            };
-            _wallet = new WalletContext(catalog, initialBalances);
 
             _statSystem.OnStatChanged += HandleStatChanged;
             _initialized = true;

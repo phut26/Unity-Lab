@@ -15,7 +15,7 @@ MonoBehaviour:
   SkillId: core_attunement
   DisplayName: Core Attunement
   Description: Strengthens arcane attunement to improve mana regeneration.
-  Icon: {fileID: 0}
+  Icon: {fileID: 21300000, guid: 65d28c00478042e4bb92ad816f1b3008, type: 3}
   MaxLevel: 3
   PrerequisiteIds: []
   Effects:
@@ -27,4 +27,4 @@ MonoBehaviour:
   - Key: gold
     CostType: 0
     Amount: 40
-  NodePosition: {x: 0, y: 20}
+  NodePosition: {x: 0, y: 0}

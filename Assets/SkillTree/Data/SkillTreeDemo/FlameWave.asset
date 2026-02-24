@@ -15,7 +15,7 @@ MonoBehaviour:
   SkillId: flame_wave
   DisplayName: Flame Wave
   Description: Expands ember impact to increase area damage.
-  Icon: {fileID: 0}
+  Icon: {fileID: 21300000, guid: fd4c69723a172cf40a60dbad2164a816, type: 3}
   MaxLevel: 2
   PrerequisiteIds:
   - ember_bolt
@@ -31,4 +31,4 @@ MonoBehaviour:
   - Key: essence
     CostType: 0
     Amount: 2
-  NodePosition: {x: -330, y: -340}
+  NodePosition: {x: -400, y: 400}

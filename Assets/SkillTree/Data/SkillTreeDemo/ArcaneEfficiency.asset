@@ -15,7 +15,7 @@ MonoBehaviour:
   SkillId: arcane_efficiency
   DisplayName: Arcane Efficiency
   Description: Refines arcane channels to reduce mana cost ratio.
-  Icon: {fileID: 0}
+  Icon: {fileID: 21300000, guid: 70157b460190fd441a581e00df996970, type: 3}
   MaxLevel: 3
   PrerequisiteIds:
   - core_attunement
@@ -31,4 +31,4 @@ MonoBehaviour:
   - Key: essence
     CostType: 0
     Amount: 1
-  NodePosition: {x: 260, y: -160}
+  NodePosition: {x: 400, y: 0}

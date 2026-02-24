@@ -1,6 +1,7 @@
 ﻿<Solution>
-  <Project Path="Assembly-CSharp-Editor.csproj" />
   <Project Path="SkillTree.Runtime.csproj" />
+  <Project Path="Assembly-CSharp-Editor.csproj" />
+  <Project Path="PlayMode.csproj" />
   <Project Path="SkillTree.EditModeTests.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
 </Solution>

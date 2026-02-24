@@ -15,7 +15,7 @@ MonoBehaviour:
   SkillId: ember_bolt
   DisplayName: Ember Bolt
   Description: Launches condensed embers that improve spell power.
-  Icon: {fileID: 0}
+  Icon: {fileID: 21300000, guid: 79db84983ffb5054c9222de685d25375, type: 3}
   MaxLevel: 4
   PrerequisiteIds:
   - core_attunement
@@ -31,4 +31,4 @@ MonoBehaviour:
   - Key: essence
     CostType: 0
     Amount: 1
-  NodePosition: {x: -260, y: -160}
+  NodePosition: {x: -400, y: 0}

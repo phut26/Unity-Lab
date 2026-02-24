@@ -233,24 +233,25 @@ namespace SkillTree.Tests.PlayMode
             SkillTreeBehaviour behaviour = root.AddComponent<SkillTreeBehaviour>();
             StatSystem statSystem = root.AddComponent<StatSystem>();
             SkillEffectAdapter adapter = root.AddComponent<SkillEffectAdapter>();
+            int startingGold = balances.TryGetValue("gold", out int gold) ? gold : 0;
+            int startingEssence = balances.TryGetValue("essence", out int essence) ? essence : 0;
 
             SetPrivateField(behaviour, "_skillData", new List<SkillSO>(skills));
             SetPrivateField(behaviour, "_resourceCatalog", catalog);
+            SetPrivateField(behaviour, "_startingGold", startingGold);
+            SetPrivateField(behaviour, "_startingEssence", startingEssence);
             SetPrivateField(statSystem, "_baseStats", new List<StatDefinition>(stats));
             SetPrivateField(adapter, "_skillTreeBehaviour", behaviour);
             SetPrivateField(adapter, "_statSystem", statSystem);
 
             root.SetActive(true);
 
-            ICostCatalog costCatalog = new ResourceCatalogAdapter(catalog);
-            WalletContext wallet = new(costCatalog, balances);
-
             return new TestRig
             {
                 Behaviour = behaviour,
                 StatSystem = statSystem,
                 Adapter = adapter,
-                Wallet = wallet
+                Wallet = behaviour.Wallet
             };
         }
 

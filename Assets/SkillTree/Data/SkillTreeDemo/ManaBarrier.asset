@@ -15,7 +15,7 @@ MonoBehaviour:
   SkillId: mana_barrier
   DisplayName: Mana Barrier
   Description: Converts arcane efficiency into stronger mana shields.
-  Icon: {fileID: 0}
+  Icon: {fileID: 21300000, guid: 99a8b8dbde5a58f4585fe67865717bd2, type: 3}
   MaxLevel: 2
   PrerequisiteIds:
   - arcane_efficiency
@@ -31,4 +31,4 @@ MonoBehaviour:
   - Key: essence
     CostType: 0
     Amount: 2
-  NodePosition: {x: 330, y: -340}
+  NodePosition: {x: -400, y: 400}
