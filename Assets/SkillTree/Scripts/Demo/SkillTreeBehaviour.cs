@@ -40,5 +40,14 @@ namespace SkillTree.Demo
 
             return new SkillTreePresenter(_skillData, _session.Service, _session.Wallet);
         }
+        
+
+        [ContextMenu("Reset Skill Progression")]
+        public void ResetSkillProgression()
+        {
+            if (_session == null)
+                Awake();
+            _session.Service.ResetProgression();
+        }
     }
 }
