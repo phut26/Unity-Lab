@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 
 namespace SkillTree.Core
@@ -37,8 +38,8 @@ namespace SkillTree.Core
         private static List<SkillSO> ValidateSkillData(IEnumerable<SkillSO> skillData)
         {
             List<SkillSO> skills = skillData is ICollection<SkillSO> skillCollection
-                ? new (skillCollection.Count)
-                : new ();
+                ? new(skillCollection.Count)
+                : new();
 
             foreach (SkillSO skill in skillData)
             {
@@ -217,6 +218,10 @@ namespace SkillTree.Core
             }
             SaveProgression();
             OnLevelsReset?.Invoke();
+
+#if UNITY_EDITOR
+            Debug.Log("Skill Progression Reset");
+#endif
         }
     }
 }

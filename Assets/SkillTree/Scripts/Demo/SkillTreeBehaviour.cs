@@ -24,6 +24,11 @@ namespace SkillTree.Demo
 
         private void Awake()
         {
+            InitSession();
+        }
+
+        private void InitSession()
+        {
             Dictionary<string, int> initialBalances = new()
             {
                 ["gold"] = Mathf.Max(0, _startingGold),
@@ -33,6 +38,7 @@ namespace SkillTree.Demo
             _session = new SkillTreeSession(_skillData, _resourceCatalog, initialBalances);
         }
 
+
         public SkillTreePresenter CreatePresenter()
         {
             if (_session == null)
@@ -40,14 +46,13 @@ namespace SkillTree.Demo
 
             return new SkillTreePresenter(_skillData, _session.Service, _session.Wallet);
         }
-        
+
 
         [ContextMenu("Reset Skill Progression")]
         public void ResetSkillProgression()
         {
-            if (_session == null)
-                Awake();
-            _session.Service.ResetProgression();
+            if (_session == null) InitSession();
+            Service.ResetProgression();
         }
     }
 }
