@@ -109,7 +109,7 @@ namespace SkillTree.Demo
                 SkillTreeNodeView view = GetOrCreateView(node.SkillId);
 
                 view.Bind(node, string.Equals(node.SkillId, _selectedSkillId, StringComparison.Ordinal), HandleNodeSelected);
-                view.SetIcon(FindIcon(node.SkillId));
+                view.SetIcon(node.Icon);
             }
 
             List<string> removedIds = new();
@@ -324,19 +324,6 @@ namespace SkillTree.Demo
                     return true;
 
             return false;
-        }
-
-        private Sprite FindIcon(string skillId)
-        {
-            IReadOnlyList<SkillSO> skillData = _skillTreeBehaviour.SkillData;
-            if (skillData == null)
-                return null;
-
-            foreach (SkillSO skill in skillData)
-                if (skill != null && string.Equals(skill.SkillId, skillId, StringComparison.Ordinal))
-                    return skill.Icon;
-
-            return null;
         }
 
         private void UnbindPresenter()

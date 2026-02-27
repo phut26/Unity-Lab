@@ -17,6 +17,7 @@ namespace SkillTree.Core
 
     public class SkillTreeService
     {
+        private readonly List<Skill> _orderedSkills = new();
         private readonly Dictionary<string, Skill> _skillCache = new();
         private readonly ISkillProgressStore _store;
         public event Action<Skill> OnLevelChanged;
@@ -69,6 +70,8 @@ namespace SkillTree.Core
 
                 if (!_skillCache.TryAdd(skillSO.SkillId, newSkill))
                     throw new InvalidOperationException($"Duplicated skill id: {skillSO.SkillId}");
+
+                _orderedSkills.Add(newSkill);
             }
 
             ValidatePrerequisites();
@@ -198,7 +201,7 @@ namespace SkillTree.Core
             throw new KeyNotFoundException();
         }
 
-        public IReadOnlyCollection<Skill> GetAllSkills() => _skillCache.Values;
+        public IReadOnlyList<Skill> GetAllSkills() => _orderedSkills;
 
         public void SaveProgression()
         {

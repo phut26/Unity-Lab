@@ -7,18 +7,15 @@ namespace SkillTree.Demo
 {
     public sealed class SkillTreePresenter : IDisposable
     {
-        private readonly IReadOnlyList<SkillSO> _skillData;
         private readonly SkillTreeService _service;
         private readonly ISkillContext _skillContext;
         private readonly List<SkillNodeViewModel> _nodes = new();
         private bool _isDisposed;
 
         public SkillTreePresenter(
-            IReadOnlyList<SkillSO> skillData,
             SkillTreeService service,
             ISkillContext skillContext)
         {
-            _skillData = skillData ?? throw new ArgumentNullException(nameof(skillData));
             _service = service ?? throw new ArgumentNullException(nameof(service));
             _skillContext = skillContext ?? throw new ArgumentNullException(nameof(skillContext));
 
@@ -43,35 +40,18 @@ namespace SkillTree.Demo
         {
             _nodes.Clear();
 
-            foreach (SkillSO skillData in _skillData)
+            foreach (Skill skill in _service.GetAllSkills())
             {
-                if (skillData == null || string.IsNullOrWhiteSpace(skillData.SkillId))
-                    continue;
-
-                Skill skill = _service.GetSkillById(skillData.SkillId);
                 bool isLocked = !_service.ArePrerequisitesMet(skill.SkillId);
-                bool isUnlocked = !isLocked;
                 bool isMaxed = skill.IsMaxedLevel;
-                bool canAfford = isUnlocked && !isMaxed && _skillContext.CanPay(skill.UpgradeCosts);
-                bool canUpgrade = isUnlocked && !isMaxed && canAfford;
-                string displayName = string.IsNullOrWhiteSpace(skillData.DisplayName)
-                    ? skill.SkillId
-                    : skillData.DisplayName.Trim();
+                bool canAfford = !isLocked && !isMaxed && _skillContext.CanPay(skill.UpgradeCosts);
+                bool canUpgrade = !isLocked && !isMaxed && canAfford;
 
                 _nodes.Add(new SkillNodeViewModel(
-                    skill.SkillId,
-                    displayName,
-                    skillData.Description ?? string.Empty,
-                    skillData.NodePosition,
-                    skill.Level,
-                    skill.MaxLevel,
+                    skill,
                     isLocked,
-                    isUnlocked,
-                    isMaxed,
                     canAfford,
-                    canUpgrade,
-                    skill.PrerequisiteIds,
-                    skill.UpgradeCosts));
+                    canUpgrade));
             }
 
             OnChanged?.Invoke(_nodes);

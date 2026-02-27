@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 
 namespace SkillTree.Core
 {
     public class Skill
     {
+        private readonly SkillSO _definition;
         private readonly int _maxLevel;
         private readonly string _skillId;
         private int _currentLevel;
@@ -20,6 +22,7 @@ namespace SkillTree.Core
             if (skillData == null) 
                 throw new ArgumentNullException(nameof(skillData));
 
+            _definition = skillData;
             _skillId = skillData.SkillId;
             _maxLevel = skillData.MaxLevel;
             _currentLevel = Math.Clamp(level, 0, _maxLevel);
@@ -33,6 +36,11 @@ namespace SkillTree.Core
         public int Level => _currentLevel;
         public int MaxLevel => _maxLevel;
         public string SkillId => _skillId;
+        public SkillSO Definition => _definition;
+        public string DisplayName => _definition.DisplayName;
+        public string Description => _definition.Description;
+        public Sprite Icon => _definition.Icon;
+        public Vector2 NodePosition => _definition.NodePosition;
         public bool IsMaxedLevel => Level >= MaxLevel;
 
 

@@ -8,47 +8,32 @@ namespace SkillTree.Demo
     public sealed class SkillNodeViewModel
     {
         public SkillNodeViewModel(
-            string skillId,
-            string displayName,
-            string description,
-            Vector2 nodePosition,
-            int level,
-            int maxLevel,
+            Skill skill,
             bool isLocked,
-            bool isUnlocked,
-            bool isMaxed,
             bool canAfford,
-            bool canUpgrade,
-            IReadOnlyList<string> prerequisiteIds,
-            IReadOnlyList<CostDefinition> upgradeCosts)
+            bool canUpgrade)
         {
-            SkillId = skillId;
-            DisplayName = displayName;
-            Description = description;
-            NodePosition = nodePosition;
-            Level = level;
-            MaxLevel = maxLevel;
+            Skill = skill ?? throw new ArgumentNullException(nameof(skill));
             IsLocked = isLocked;
-            IsUnlocked = isUnlocked;
-            IsMaxed = isMaxed;
             CanAfford = canAfford;
             CanUpgrade = canUpgrade;
-            PrerequisiteIds = prerequisiteIds ?? Array.Empty<string>();
-            UpgradeCosts = upgradeCosts ?? Array.Empty<CostDefinition>();
         }
 
-        public string SkillId { get; }
-        public string DisplayName { get; }
-        public string Description { get; }
-        public Vector2 NodePosition { get; }
-        public int Level { get; }
-        public int MaxLevel { get; }
+        public Skill Skill { get; }
+        public string SkillId => Skill.SkillId;
+        public string DisplayName =>
+            string.IsNullOrWhiteSpace(Skill.DisplayName) ? Skill.SkillId : Skill.DisplayName.Trim();
+        public string Description => Skill.Description ?? string.Empty;
+        public Sprite Icon => Skill.Icon;
+        public Vector2 NodePosition => Skill.NodePosition;
+        public int Level => Skill.Level;
+        public int MaxLevel => Skill.MaxLevel;
         public bool IsLocked { get; }
-        public bool IsUnlocked { get; }
-        public bool IsMaxed { get; }
+        public bool IsUnlocked => !IsLocked;
+        public bool IsMaxed => Skill.IsMaxedLevel;
         public bool CanAfford { get; }
         public bool CanUpgrade { get; }
-        public IReadOnlyList<string> PrerequisiteIds { get; }
-        public IReadOnlyList<CostDefinition> UpgradeCosts { get; }
+        public IReadOnlyList<string> PrerequisiteIds => Skill.PrerequisiteIds;
+        public IReadOnlyList<CostDefinition> UpgradeCosts => Skill.UpgradeCosts;
     }
 }

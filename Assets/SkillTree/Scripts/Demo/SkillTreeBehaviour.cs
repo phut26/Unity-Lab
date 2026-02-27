@@ -44,7 +44,7 @@ namespace SkillTree.Demo
             if (_session == null)
                 throw new InvalidOperationException("SkillTreeSession is not initialized.");
 
-            return new SkillTreePresenter(_skillData, _session.Service, _session.Wallet);
+            return new SkillTreePresenter(_session.Service, _session.Wallet);
         }
 
 

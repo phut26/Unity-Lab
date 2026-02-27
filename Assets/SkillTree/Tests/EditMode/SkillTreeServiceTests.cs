@@ -302,7 +302,7 @@ namespace SkillTree.Tests.EditMode
             FakeWalletContext wallet = new(new Dictionary<string, int> { ["gold"] = 20 });
             SkillTreeService service = new(new[] { root, child }, store, catalog);
 
-            using SkillTreePresenter presenter = new(new[] { root, child }, service, wallet);
+            using SkillTreePresenter presenter = new(service, wallet);
 
             SkillNodeViewModel rootNode = presenter.GetNodeById("root");
             SkillNodeViewModel childNode = presenter.GetNodeById("child");
@@ -340,7 +340,7 @@ namespace SkillTree.Tests.EditMode
             FakeWalletContext wallet = new(new Dictionary<string, int> { ["gold"] = 100 });
             SkillTreeService service = new(new[] { skill }, store, catalog);
 
-            using SkillTreePresenter presenter = new(new[] { skill }, service, wallet);
+            using SkillTreePresenter presenter = new(service, wallet);
             SkillNodeViewModel node = presenter.GetNodeById("maxed");
 
             Assert.That(node.IsUnlocked, Is.True);
@@ -361,7 +361,7 @@ namespace SkillTree.Tests.EditMode
             FakeWalletContext wallet = new(new Dictionary<string, int> { ["gold"] = 10 });
             SkillTreeService service = new(new[] { skill }, store, catalog);
 
-            using SkillTreePresenter presenter = new(new[] { skill }, service, wallet);
+            using SkillTreePresenter presenter = new(service, wallet);
             SkillNodeViewModel node = presenter.GetNodeById("costly");
             Assert.That(node.CanAfford, Is.False);
             Assert.That(node.CanUpgrade, Is.False);
@@ -387,7 +387,7 @@ namespace SkillTree.Tests.EditMode
             FakeWalletContext wallet = new(new Dictionary<string, int> { ["gold"] = 100 });
             SkillTreeService service = new(new[] { skill }, store, catalog);
 
-            using SkillTreePresenter presenter = new(new[] { skill }, service, wallet);
+            using SkillTreePresenter presenter = new(service, wallet);
             Assert.That(presenter.TryUpgrade("resettable"), Is.EqualTo(SkillUpgradeResult.Success));
             Assert.That(presenter.GetNodeById("resettable").Level, Is.EqualTo(1));
 
