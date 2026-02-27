@@ -1,7 +1,8 @@
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Serialization;
+
 
 namespace SkillTree.Demo
 {
@@ -12,7 +13,7 @@ namespace SkillTree.Demo
         [SerializeField] private Image _iconImage;
         [SerializeField] private Image _stateImage;
         [SerializeField] private Image _selectionFrameImage;
-        [SerializeField] private Text _nameText;
+        [SerializeField] private TextMeshProUGUI _nameText;
 
         [Header("State Colors")]
         [SerializeField] private Color _lockedColor = new(0.35f, 0.35f, 0.35f, 1f);

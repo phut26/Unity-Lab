@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: SkillTree.Runtime::SkillTree.Core.SkillSO
   SkillId: core_attunement
   DisplayName: Core Attunement
-  Description: Strengthens arcane attunement to improve mana regeneration.
+  Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua.
   Icon: {fileID: 21300000, guid: 65d28c00478042e4bb92ad816f1b3008, type: 3}
   MaxLevel: 3
   PrerequisiteIds: []

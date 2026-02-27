@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using SkillTree.Core;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,11 +11,11 @@ namespace SkillTree.Demo
     public sealed class SkillTreeDetailPanelView : MonoBehaviour
     {
         [Header("References")]
-        [SerializeField] private Text _nameText;
-        [SerializeField] private Text _descriptionText;
-        [SerializeField] private Text _levelText;
-        [SerializeField] private Text _statusText;
-        [SerializeField] private Text _costText;
+        [SerializeField] private TextMeshProUGUI _nameText;
+        [SerializeField] private TextMeshProUGUI _descriptionText;
+        [SerializeField] private TextMeshProUGUI _levelText;
+        [SerializeField] private TextMeshProUGUI _statusText;
+        [SerializeField] private TextMeshProUGUI _costText;
         [SerializeField] private Button _upgradeButton;
 
         [Header("Placeholders")]
