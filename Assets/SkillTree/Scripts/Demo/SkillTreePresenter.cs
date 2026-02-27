@@ -33,7 +33,7 @@ namespace SkillTree.Demo
         public SkillUpgradeResult TryUpgrade(string skillId)
         {
             SkillUpgradeResult result = _service.TryUpgrade(skillId, _skillContext);
-            if (result != SkillUpgradeResult.Success)
+            if (result != SkillUpgradeResult.Success) // to prevent duplicate UI refresh
                 Refresh();
 
             return result;
