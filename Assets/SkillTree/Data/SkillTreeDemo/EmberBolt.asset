@@ -31,4 +31,4 @@ MonoBehaviour:
   - Key: essence
     CostType: 0
     Amount: 1
-  NodePosition: {x: -400, y: 0}
+  NodePosition: {x: -200, y: 0}

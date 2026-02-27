@@ -5,18 +5,14 @@ using UnityEngine.Serialization;
 
 namespace SkillTree.Demo
 {
+    [RequireComponent(typeof(Button))]
     public sealed class SkillTreeNodeView : MonoBehaviour
     {
         [Header("References")]
-        [SerializeField] private RectTransform _rectTransform;
-        [FormerlySerializedAs("_upgradeButton")]
-        [SerializeField] private Button _selectButton;
         [SerializeField] private Image _iconImage;
         [SerializeField] private Image _stateImage;
         [SerializeField] private Image _selectionFrameImage;
         [SerializeField] private Text _nameText;
-        [SerializeField] private Text _levelText;
-        [SerializeField] private Text _statusText;
 
         [Header("State Colors")]
         [SerializeField] private Color _lockedColor = new(0.35f, 0.35f, 0.35f, 1f);
@@ -26,16 +22,16 @@ namespace SkillTree.Demo
         [SerializeField] private Color _selectedFrameColor = new(1f, 0.85f, 0.35f, 1f);
         [SerializeField] private Color _idleFrameColor = new(1f, 1f, 1f, 0.25f);
 
+        private RectTransform _rootTransform;
+        private Button _selectButton;
         private string _skillId;
         private Action<string> _selected;
 
         private void Awake()
         {
-            if (_rectTransform == null)
-                _rectTransform = transform as RectTransform;
-
-            if (_selectButton != null)
-                _selectButton.onClick.AddListener(HandleSelected);
+            _rootTransform = transform as RectTransform;
+            _selectButton = GetComponent<Button>();
+            _selectButton.onClick.AddListener(HandleSelected);
         }
 
         private void OnDestroy()
@@ -51,17 +47,11 @@ namespace SkillTree.Demo
             _skillId = node.SkillId;
             _selected = onSelected;
 
-            if (_rectTransform != null)
-                _rectTransform.anchoredPosition = node.NodePosition;
+            if (_rootTransform != null)
+                _rootTransform.anchoredPosition = node.NodePosition;
 
             if (_nameText != null)
                 _nameText.text = node.DisplayName;
-
-            if (_levelText != null)
-                _levelText.text = $"Lv {node.Level}/{node.MaxLevel}";
-
-            if (_statusText != null)
-                _statusText.text = BuildStatus(node);
 
             if (_selectButton != null)
                 _selectButton.interactable = true;
@@ -84,7 +74,7 @@ namespace SkillTree.Demo
 
         public Vector2 GetAnchoredPosition()
         {
-            return _rectTransform != null ? _rectTransform.anchoredPosition : Vector2.zero;
+            return _rootTransform != null ? _rootTransform.anchoredPosition : Vector2.zero;
         }
 
         private void HandleSelected()
@@ -93,14 +83,6 @@ namespace SkillTree.Demo
                 return;
 
             _selected?.Invoke(_skillId);
-        }
-
-        private string BuildStatus(SkillNodeViewModel node)
-        {
-            if (node.IsMaxed) return "Maxed";
-            if (node.IsLocked) return "Locked";
-            if (!node.CanAfford) return "Insufficient";
-            return "Ready";
         }
 
         private Color ResolveStateColor(SkillNodeViewModel node)

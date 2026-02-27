@@ -83,14 +83,13 @@ namespace SkillTree.Demo
 
             if (_skillTreeBehaviour == null || _nodeViewPrefab == null)
             {
+#if UNITY_EDITOR
                 Debug.LogWarning("[SkillTreeDemo] Missing references for SkillTreeCanvasController.");
+#endif
                 return;
             }
 
-            if (_skillTreeBehaviour.Session == null)
-            {
-                return;
-            }
+            if (_skillTreeBehaviour.Session == null) return;
 
             _presenter = _skillTreeBehaviour.CreatePresenter();
             _presenter.OnChanged += HandlePresenterChanged;
@@ -252,7 +251,9 @@ namespace SkillTree.Demo
             SkillUpgradeResult result = _presenter.TryUpgrade(skillId);
             if (result != SkillUpgradeResult.Success)
             {
+#if UNITY_EDITOR
                 Debug.Log($"[SkillTreeDemo] Upgrade '{skillId}' failed: {result}");
+#endif
                 RefreshDetailPanel();
             }
         }
@@ -279,7 +280,9 @@ namespace SkillTree.Demo
             {
                 if (!_warnedMissingConnectionPrefab)
                 {
+#if UNITY_EDITOR
                     Debug.LogWarning("[SkillTreeDemo] Connection view prefab is not assigned. Skip drawing connections.");
+#endif
                     _warnedMissingConnectionPrefab = true;
                 }
 
