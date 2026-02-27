@@ -1,10 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
-using SkillTree.Core;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace SkillTree.Demo
 {
@@ -16,7 +12,12 @@ namespace SkillTree.Demo
         [SerializeField] private TextMeshProUGUI _levelText;
         [SerializeField] private TextMeshProUGUI _statusText;
         [SerializeField] private TextMeshProUGUI _costText;
-        [SerializeField] private Button _upgradeButton;
+        [SerializeField] private UnityEngine.UI.Button _upgradeButton;
+
+        [Header("Stats References")]
+        [SerializeField] private TextMeshProUGUI _statsTitleText;
+        [SerializeField] private TextMeshProUGUI _statsBodyText;
+        [SerializeField] private StatSystem _statSystem;
 
         [Header("Placeholders")]
         [SerializeField] private string _emptyTitle = "Select a skill";
@@ -24,110 +25,64 @@ namespace SkillTree.Demo
         [SerializeField] private string _emptyLevel = "-";
         [SerializeField] private string _emptyStatus = "-";
         [SerializeField] private string _emptyCost = "-";
+        [SerializeField] private string _emptyStatsTitle = "Stats";
+        [SerializeField] private string _emptyStatsBody = "Select a skill to view stat modifiers.";
+        [SerializeField] private string _noStatEffectsText = "No stat modifiers.";
 
-        private string _selectedSkillId;
-        private Action<string> _upgradeRequested;
+        private SkillInfoSectionView _skillInfoSection;
+        private SkillStatsSectionView _statsSection;
 
         private void Awake()
         {
-            if (_upgradeButton != null)
-                _upgradeButton.onClick.AddListener(HandleUpgradeClicked);
+            if (_statSystem == null)
+                _statSystem = FindFirstObjectByType<StatSystem>();
+
+            EnsureSectionsInitialized();
         }
 
         private void OnDestroy()
         {
-            if (_upgradeButton != null)
-                _upgradeButton.onClick.RemoveListener(HandleUpgradeClicked);
+            _skillInfoSection?.Dispose();
         }
 
         public void Bind(SkillNodeViewModel node, Action<string> onUpgradeRequested)
         {
             if (node == null) throw new ArgumentNullException(nameof(node));
 
-            _selectedSkillId = node.SkillId;
-            _upgradeRequested = onUpgradeRequested;
-
-            if (_nameText != null)
-                _nameText.text = node.DisplayName;
-
-            if (_descriptionText != null)
-                _descriptionText.text = node.Description;
-
-            if (_levelText != null)
-                _levelText.text = $"Lv {node.Level}/{node.MaxLevel}";
-
-            if (_statusText != null)
-                _statusText.text = BuildStatus(node);
-
-            if (_costText != null)
-                _costText.text = BuildCostText(node.UpgradeCosts);
-
-            if (_upgradeButton != null)
-                _upgradeButton.interactable = node.CanUpgrade;
+            EnsureSectionsInitialized();
+            _skillInfoSection?.Bind(node, onUpgradeRequested);
+            _statsSection?.Bind(node);
         }
 
         public void Clear()
         {
-            _selectedSkillId = null;
-            _upgradeRequested = null;
-
-            if (_nameText != null)
-                _nameText.text = _emptyTitle;
-
-            if (_descriptionText != null)
-                _descriptionText.text = _emptyDescription;
-
-            if (_levelText != null)
-                _levelText.text = _emptyLevel;
-
-            if (_statusText != null)
-                _statusText.text = _emptyStatus;
-
-            if (_costText != null)
-                _costText.text = _emptyCost;
-
-            if (_upgradeButton != null)
-                _upgradeButton.interactable = false;
+            EnsureSectionsInitialized();
+            _skillInfoSection?.Clear();
+            _statsSection?.Clear();
         }
 
-        private void HandleUpgradeClicked()
+        private void EnsureSectionsInitialized()
         {
-            if (string.IsNullOrWhiteSpace(_selectedSkillId))
-                return;
+            _skillInfoSection ??= new SkillInfoSectionView(
+                    _nameText,
+                    _descriptionText,
+                    _levelText,
+                    _statusText,
+                    _costText,
+                    _upgradeButton,
+                    _emptyTitle,
+                    _emptyDescription,
+                    _emptyLevel,
+                    _emptyStatus,
+                    _emptyCost);
 
-            _upgradeRequested?.Invoke(_selectedSkillId);
-        }
-
-        private static string BuildStatus(SkillNodeViewModel node)
-        {
-            if (node.IsMaxed) return "Maxed";
-            if (node.IsLocked) return "Locked";
-            if (!node.CanAfford) return "Insufficient resources";
-            return "Ready to upgrade";
-        }
-
-        private static string BuildCostText(IReadOnlyList<CostDefinition> costs)
-        {
-            if (costs == null || costs.Count == 0)
-                return "No cost";
-
-            StringBuilder builder = new();
-            for (int i = 0; i < costs.Count; i++)
-            {
-                CostDefinition cost = costs[i];
-                string key = string.IsNullOrWhiteSpace(cost.Key) ? "unknown" : cost.Key.Trim();
-                builder.Append(key);
-                builder.Append(": ");
-                builder.Append(cost.Amount);
-                builder.Append(" (");
-                builder.Append(cost.CostType);
-                builder.Append(')');
-
-                if (i < costs.Count - 1)
-                    builder.AppendLine();
-            }
-
-            return builder.ToString();
+            _statsSection ??= new SkillStatsSectionView(
+                    _statsTitleText,
+                    _statsBodyText,
+                    _statSystem,
+                    _emptyStatsTitle,
+                    _emptyStatsBody,
+                    _noStatEffectsText);
         }
     }
 }

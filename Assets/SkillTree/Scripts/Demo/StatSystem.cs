@@ -8,6 +8,9 @@ namespace SkillTree.Demo
     public struct StatDefinition
     {
         public string StatId;
+        public string DisplayName;
+        [TextArea]
+        public string Description;
         public float BaseValue;
     }
 
@@ -16,6 +19,8 @@ namespace SkillTree.Demo
         [SerializeField] private List<StatDefinition> _baseStats = new();
 
         private readonly Dictionary<string, float> _baseValues =
+            new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, StatDefinition> _definitionsById =
             new(StringComparer.OrdinalIgnoreCase);
 
         private readonly Dictionary<string, List<Core.EffectModifier>> _modifiersByStat =
@@ -31,13 +36,25 @@ namespace SkillTree.Demo
         public void RebuildBaseStats()
         {
             _baseValues.Clear();
+            _definitionsById.Clear();
             foreach (StatDefinition stat in _baseStats)
             {
                 if (string.IsNullOrWhiteSpace(stat.StatId))
                     continue;
 
-                _baseValues[stat.StatId.Trim()] = stat.BaseValue;
+                string statId = stat.StatId.Trim();
+                _baseValues[statId] = stat.BaseValue;
+                _definitionsById[statId] = stat;
             }
+        }
+
+        public bool TryGetDefinition(string statId, out StatDefinition definition)
+        {
+            definition = default;
+            if (string.IsNullOrWhiteSpace(statId))
+                return false;
+
+            return _definitionsById.TryGetValue(statId.Trim(), out definition);
         }
 
         public float GetFinalValue(string statId)
