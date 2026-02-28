@@ -45,12 +45,15 @@ namespace SkillTree.Demo
             _skillInfoSection?.Dispose();
         }
 
-        public void Bind(SkillNodeViewModel node, Action<string> onUpgradeRequested)
+        public void Bind(
+            SkillNodeViewModel node,
+            Action<string> onUpgradeRequested,
+            Func<string, int> balanceResolver = null)
         {
             if (node == null) throw new ArgumentNullException(nameof(node));
 
             EnsureSectionsInitialized();
-            _skillInfoSection?.Bind(node, onUpgradeRequested);
+            _skillInfoSection?.Bind(node, onUpgradeRequested, balanceResolver);
             _statsSection?.Bind(node);
         }
 

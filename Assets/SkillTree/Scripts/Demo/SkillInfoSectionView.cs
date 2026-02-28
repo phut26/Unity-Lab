@@ -54,7 +54,10 @@ namespace SkillTree.Demo
                 _upgradeButton.onClick.AddListener(HandleUpgradeClicked);
         }
 
-        public void Bind(SkillNodeViewModel node, Action<string> onUpgradeRequested)
+        public void Bind(
+            SkillNodeViewModel node,
+            Action<string> onUpgradeRequested,
+            Func<string, int> balanceResolver = null)
         {
             if (node == null) throw new ArgumentNullException(nameof(node));
 
@@ -74,7 +77,7 @@ namespace SkillTree.Demo
                 _statusText.text = BuildStatus(node);
 
             if (_costText != null)
-                _costText.text = BuildCostText(node.UpgradeCosts);
+                _costText.text = BuildCostText(node.UpgradeCosts, balanceResolver);
 
             if (_upgradeButton != null)
                 _upgradeButton.interactable = node.CanUpgrade;
@@ -126,7 +129,9 @@ namespace SkillTree.Demo
             return "Ready to upgrade";
         }
 
-        private static string BuildCostText(IReadOnlyList<CostDefinition> costs)
+        private static string BuildCostText(
+            IReadOnlyList<CostDefinition> costs,
+            Func<string, int> balanceResolver)
         {
             if (costs == null || costs.Count == 0)
                 return "No cost";
@@ -138,7 +143,32 @@ namespace SkillTree.Demo
                 string key = string.IsNullOrWhiteSpace(cost.Key) ? "unknown" : cost.Key.Trim();
                 builder.Append(key);
                 builder.Append(": ");
-                builder.Append(cost.Amount);
+
+                bool canShowBalance =
+                    balanceResolver != null
+                    && cost.CostType == CostType.Currency
+                    && !string.IsNullOrWhiteSpace(cost.Key);
+
+                if (canShowBalance)
+                {
+                    int balance = Math.Max(0, balanceResolver(key));
+                    bool isInsufficient = balance < cost.Amount;
+
+                    if (isInsufficient)
+                        builder.Append("<color=#FF6B6B>");
+
+                    builder.Append(balance);
+                    builder.Append('/');
+                    builder.Append(cost.Amount);
+
+                    if (isInsufficient)
+                        builder.Append("</color>");
+                }
+                else
+                {
+                    builder.Append(cost.Amount);
+                }
+
                 builder.Append(" (");
                 builder.Append(cost.CostType);
                 builder.Append(')');

@@ -1047,6 +1047,7 @@ MonoBehaviour:
   _upgradeButton: {fileID: 268879200}
   _statsTitleText: {fileID: 132725571}
   _statsBodyText: {fileID: 791440951}
+  _statSystem: {fileID: 0}
   _emptyTitle: Select a skill
   _emptyDescription: Click a node to view details.
   _emptyLevel: '-'
@@ -2001,8 +2002,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 747e912b3038483c9b9cac0feaa37347, type: 2}
   - {fileID: 11400000, guid: 8bed69a00110404db8fad6b23ee7d924, type: 2}
   _resourceCatalog: {fileID: 11400000, guid: a04b0c376613d8042a05e2aba01f8db5, type: 2}
-  _startingGold: 1200
-  _startingEssence: 30
+  _startingGold: 50
+  _startingEssence: 10
 --- !u!4 &1254251141
 Transform:
   m_ObjectHideFlags: 0

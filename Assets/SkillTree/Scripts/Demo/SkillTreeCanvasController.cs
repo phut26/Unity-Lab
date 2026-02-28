@@ -236,7 +236,7 @@ namespace SkillTree.Demo
 
             if (_presenter.TryGetNodeById(_selectedSkillId, out SkillNodeViewModel selected))
             {
-                _detailPanel.Bind(selected, HandleUpgradeRequested);
+                _detailPanel.Bind(selected, HandleUpgradeRequested, ResolveBalance);
                 return;
             }
 
@@ -327,6 +327,12 @@ namespace SkillTree.Demo
                     return true;
 
             return false;
+        }
+
+        private int ResolveBalance(string key)
+        {
+            WalletContext wallet = _skillTreeBehaviour != null ? _skillTreeBehaviour.Wallet : null;
+            return wallet != null ? wallet.GetBalance(key) : 0;
         }
 
         private void UnbindPresenter()
