@@ -13,6 +13,11 @@ namespace SkillTree.Demo
         [SerializeField] private SkillTreeConnectionView _connectionViewPrefab;
         [SerializeField] private SkillTreeNodeView _nodeViewPrefab;
         [SerializeField] private SkillTreeDetailPanelView _detailPanel;
+        [SerializeField] private SkillTreeResourcePanelView _resourcePanel;
+        [Header("Debug Resource Increments")]
+        [SerializeField] private int _goldIncrement = 100;
+        [SerializeField] private int _essenceIncrement = 5;
+        [SerializeField] private int _fallbackCurrencyIncrement = 10;
         [SerializeField] private bool _autoRefreshOnEnable = true;
         [SerializeField] private bool _autoSelectFirstNode = true;
         [SerializeField] private float _connectionThickness = 6f;
@@ -31,6 +36,9 @@ namespace SkillTree.Demo
         {
             if (_skillTreeBehaviour == null)
                 _skillTreeBehaviour = FindFirstObjectByType<SkillTreeBehaviour>();
+
+            if (_resourcePanel == null)
+                _resourcePanel = FindFirstObjectByType<SkillTreeResourcePanelView>();
         }
 
         private void OnEnable()
@@ -94,6 +102,7 @@ namespace SkillTree.Demo
             _presenter = _skillTreeBehaviour.CreatePresenter();
             _presenter.OnChanged += HandlePresenterChanged;
             _isInitialized = true;
+            BindResourcePanel();
 
             _presenter.Refresh();
         }
@@ -128,6 +137,7 @@ namespace SkillTree.Demo
             SyncSelectionVisuals(nodes);
             SyncConnections(nodes);
             RefreshDetailPanel();
+            _resourcePanel?.RefreshBalances();
         }
 
         private void EnsureSelection(IReadOnlyList<SkillNodeViewModel> nodes)
@@ -258,6 +268,43 @@ namespace SkillTree.Demo
             }
         }
 
+        private void HandleAddResourcesRequested()
+        {
+            WalletContext wallet = _skillTreeBehaviour != null ? _skillTreeBehaviour.Wallet : null;
+            ResourceCatalogSO catalog = _skillTreeBehaviour != null ? _skillTreeBehaviour.ResourceCatalog : null;
+            if (wallet == null || catalog == null)
+                return;
+
+            foreach (ResourceCatalogSO.Entry entry in catalog.Entries)
+            {
+                if (entry.CostType != CostType.Currency || string.IsNullOrWhiteSpace(entry.Key))
+                    continue;
+
+                string key = entry.Key.Trim();
+                int amount = ResolveDebugIncrement(key);
+                if (amount <= 0)
+                    continue;
+
+                wallet.Add(key, amount);
+            }
+
+            if (_presenter != null)
+                _presenter.Refresh();
+            else
+                _resourcePanel?.RefreshBalances();
+        }
+
+        private void HandleResetProgressionRequested()
+        {
+            if (_skillTreeBehaviour == null)
+                return;
+
+            _skillTreeBehaviour.ResetSkillProgression();
+
+            if (_presenter == null)
+                _resourcePanel?.RefreshBalances();
+        }
+
         private SkillTreeNodeView GetOrCreateView(string skillId)
         {
             if (_nodeViews.TryGetValue(skillId, out SkillTreeNodeView existing) && existing != null)
@@ -335,10 +382,42 @@ namespace SkillTree.Demo
             return wallet != null ? wallet.GetBalance(key) : 0;
         }
 
+        private void BindResourcePanel()
+        {
+            if (_resourcePanel == null)
+                return;
+
+            ResourceCatalogSO catalog = _skillTreeBehaviour != null ? _skillTreeBehaviour.ResourceCatalog : null;
+            _resourcePanel.Bind(
+                catalog,
+                ResolveBalance,
+                HandleAddResourcesRequested,
+                HandleResetProgressionRequested);
+        }
+
+        private int ResolveDebugIncrement(string key)
+        {
+            if (string.Equals(key, "gold", StringComparison.OrdinalIgnoreCase))
+                return Math.Max(1, _goldIncrement);
+
+            if (string.Equals(key, "essence", StringComparison.OrdinalIgnoreCase))
+                return Math.Max(1, _essenceIncrement);
+
+            return Math.Max(1, _fallbackCurrencyIncrement);
+        }
+
         private void UnbindPresenter()
         {
             if (_presenter == null)
+            {
+                if (_detailPanel != null)
+                    _detailPanel.Clear();
+
+                if (_resourcePanel != null)
+                    _resourcePanel.Clear();
+
                 return;
+            }
 
             _presenter.OnChanged -= HandlePresenterChanged;
             _presenter.Dispose();
@@ -348,6 +427,9 @@ namespace SkillTree.Demo
 
             if (_detailPanel != null)
                 _detailPanel.Clear();
+
+            if (_resourcePanel != null)
+                _resourcePanel.Clear();
 
             foreach (KeyValuePair<string, SkillTreeConnectionView> pair in _connections)
                 if (pair.Value != null)

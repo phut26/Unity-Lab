@@ -21,6 +21,7 @@ namespace SkillTree.Demo
         public ICostCatalog Catalog => _session?.Catalog;
         public ISkillProgressStore Store => _session?.Store;
         public IReadOnlyList<SkillSO> SkillData => _skillData;
+        public ResourceCatalogSO ResourceCatalog => _resourceCatalog;
 
         private void Awake()
         {
